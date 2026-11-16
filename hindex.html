@@ -1,0 +1,1748 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Lab Clash: Pertarungan Sains</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Kustomisasi Font dan Gaya Dasar */
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background-color: #050814;
+            color: #e2e8f0;
+            overflow: hidden;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+        }
+
+        .font-cyber {
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        /* Animasi Efek Neon & Pulse */
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 15px rgba(56, 189, 248, 0.5); }
+            50% { box-shadow: 0 0 25px rgba(56, 189, 248, 0.9); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translate(0, 0); }
+            20% { transform: translate(-6px, 4px); }
+            40% { transform: translate(6px, -4px); }
+            60% { transform: translate(-4px, -4px); }
+            80% { transform: translate(4px, 4px); }
+        }
+
+        .shake-screen {
+            animation: shake 0.35s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
+        /* Gaya Tombol Aksi Game */
+        .action-btn {
+            transition: all 0.15s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .action-btn:active:not(:disabled) {
+            transform: scale(0.94);
+        }
+
+        .action-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            filter: grayscale(80%);
+        }
+
+        /* Bar HP dan Energi */
+        .bar-transition {
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Canvas Responsif */
+        #arenaCanvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Modal & Overlay */
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.88);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(56, 189, 248, 0.35);
+        }
+
+        /* Gaya Panel Komik Akhir Level */
+        .comic-panel {
+            border: 3px solid #0f172a;
+            box-shadow: 4px 4px 0px #38bdf8;
+            position: relative;
+            overflow: hidden;
+        }
+        .comic-bubble {
+            background: #ffffff;
+            color: #0f172a;
+            border: 2px solid #0f172a;
+            border-radius: 14px;
+            position: relative;
+        }
+
+        /* Custom Scrollbar untuk Modal */
+        ::-webkit-scrollbar {I will now generate the corrected single-file HTML code for **Lab Clash: Pertarungan Sains** to fix the syntax error (`Unexpected token '}'`) caused by a duplicate closing bracket in the `showEndLevelComic()` function.
+
+### Ringkasan Perbaikan
+
+* Memperbaiki kesalahan sintaks (*SyntaxError: Unexpected token '}'*) dengan merapikan dan memastikan kecocokan tanda kurung kurawal (`{}`), khususnya pada blok fungsi `showEndLevelComic()`.
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.5);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(56, 189, 248, 0.4);
+            border-radius: 9999px;
+        }
+    </style>
+</head>
+<body class="h-screen w-screen flex flex-col justify-between bg-slate-950">
+
+    <!-- Header / Top Bar -->
+    <header class="w-full px-3 sm:px-4 py-2 bg-slate-900/95 border-b border-cyan-500/30 flex justify-between items-center z-20 shrink-0 gap-2">
+        <div class="flex items-center gap-2 min-w-0">
+            <span class="text-xl sm:text-2xl shrink-0">⚛️</span>
+            <div class="truncate">
+                <h1 class="font-cyber text-xs sm:text-base font-bold text-cyan-400 tracking-wider truncate">LAB CLASH: EVOLUSI 25</h1>
+                <p id="levelIndicator" class="text-[10px] sm:text-xs text-slate-400 font-semibold truncate">BAB 1/25: KEBOCORAN ASAM</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            <!-- Tombol Teka-Teki Sains (Overdrive) -->
+            <button id="puzzleBtn" class="p-1.5 sm:p-2 rounded-lg bg-indigo-500/25 hover:bg-indigo-500/40 border border-indigo-400/60 text-indigo-200 text-xs font-bold flex items-center gap-1 transition animate-pulse" title="Pecahkan Teka-Teki Sains untuk Overdrive!">
+                🧩 <span class="hidden md:inline">Teka-Teki</span>
+            </button>
+            <!-- Tombol Ruangan Robotik -->
+            <button id="workshopBtn" class="p-1.5 sm:p-2 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 border border-amber-400/50 text-amber-300 text-xs font-bold flex items-center gap-1 transition" title="Ruangan Robotik & Skuad">
+                🤖 <span class="hidden md:inline">Ruang Robotik</span>
+            </button>
+            <!-- Tombol Ensiklopedia Sains -->
+            <button id="scienceBtn" class="p-1.5 sm:p-2 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/50 text-emerald-300 text-xs font-bold flex items-center gap-1 transition" title="Penjelasan Sains">
+                🔬 <span class="hidden md:inline">Fakta Sains</span>
+            </button>
+            <!-- Tombol Cerita -->
+            <button id="storyBtn" class="p-1.5 sm:p-2 rounded-lg bg-purple-500/20 hover:bg-purple-500/30 border border-purple-400/50 text-purple-300 text-xs font-bold flex items-center gap-1 transition" title="Arsip Misi">
+                📜 <span class="hidden md:inline">Misi</span>
+            </button>
+            <!-- Tombol Audio -->
+            <button id="toggleAudioBtn" class="p-1.5 sm:p-2 rounded-lg bg-slate-800 hover:bg-slate-700 border border-cyan-500/40 text-cyan-300 text-xs font-bold flex items-center gap-1 transition" title="Hidupkan/Matikan Suara">
+                <span id="audioIcon">🔇</span> <span class="hidden sm:inline" id="audioText">Off</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Area Utama Pertarungan (Canvas + HUD) -->
+    <main id="gameContainer" class="relative flex-1 w-full overflow-hidden flex flex-col justify-between">
+        
+        <!-- Background & Karakter Canvas -->
+        <canvas id="arenaCanvas" class="absolute inset-0 z-0"></canvas>
+
+        <!-- HUD Atas: Status Pemain & Musuh -->
+        <div class="relative z-10 w-full max-w-6xl mx-auto px-2 sm:px-4 pt-2 sm:pt-4 flex justify-between items-start gap-2 sm:gap-4 pointer-events-none">
+            
+            <!-- Status Pemain (Dr. Proton + Robot Rakitan) -->
+            <div class="w-1/2 max-w-xs glass-panel p-2 sm:p-3 rounded-xl border-l-4 border-l-cyan-400 shadow-lg">
+                <div class="flex justify-between items-center mb-1">
+                    <span class="font-cyber text-[11px] sm:text-sm font-bold text-cyan-300 truncate">DR. PROTON & BOT</span>
+                    <span id="playerHpText" class="text-[11px] sm:text-xs font-bold text-white">100/100</span>
+                </div>
+                <!-- HP Bar -->
+                <div class="w-full h-2 sm:h-2.5 bg-slate-800 rounded-full overflow-hidden mb-1.5 border border-slate-700">
+                    <div id="playerHpBar" class="h-full bg-gradient-to-r from-cyan-500 to-emerald-400 bar-transition" style="width: 100%;"></div>
+                </div>
+                <!-- Energy (ATP/Plasma) Bar -->
+                <div class="flex justify-between items-center text-[10px] sm:text-xs text-amber-300 mb-0.5">
+                    <span>⚡ Energi Plasma</span>
+                    <span id="playerEnergyText">50/100</span>
+                </div>
+                <div class="w-full h-1.5 sm:h-2 bg-slate-800 rounded-full overflow-hidden border border-slate-700">
+                    <div id="playerEnergyBar" class="h-full bg-gradient-to-r from-amber-500 to-yellow-300 bar-transition" style="width: 50%;"></div>
+                </div>
+                <!-- Info Asisten & Kombo -->
+                <div id="playerBuffs" class="flex flex-wrap gap-1 mt-1.5 min-h-[18px]"></div>
+            </div>
+
+            <!-- VS & Indikator Kombo Sains -->
+            <div class="hidden sm:flex flex-col items-center justify-center pt-1">
+                <span class="font-cyber text-lg font-black text-rose-500 drop-shadow-[0_0_8px_rgba(244,63,94,0.8)]">VS</span>
+                <span id="turnBadge" class="mt-1 px-2 py-0.5 rounded text-[10px] font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">GILIRANMU</span>
+                <span id="comboBadge" class="mt-1 px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40 hidden">🔥 KOMBO REAKSI!</span>
+            </div>
+
+            <!-- Status Musuh -->
+            <div class="w-1/2 max-w-xs glass-panel p-2 sm:p-3 rounded-xl border-r-4 border-r-rose-500 shadow-lg text-right">
+                <div class="flex justify-between items-center mb-1 flex-row-reverse">
+                    <span id="enemyNameText" class="font-cyber text-[11px] sm:text-sm font-bold text-rose-400 truncate">SLIME ASAM</span>
+                    <span id="enemyHpText" class="text-[11px] sm:text-xs font-bold text-white">90/90</span>
+                </div>
+                <!-- HP Bar Musuh -->
+                <div class="w-full h-2 sm:h-2.5 bg-slate-800 rounded-full overflow-hidden mb-1.5 border border-slate-700 flex justify-end">
+                    <div id="enemyHpBar" class="h-full bg-gradient-to-l from-rose-600 to-orange-400 bar-transition" style="width: 100%;"></div>
+                </div>
+                <!-- Kelemahan Elemen & Prediksi Aksi -->
+                <div class="flex flex-col gap-0.5 text-[10px] sm:text-xs mt-1">
+                    <div class="flex justify-between items-center text-amber-300">
+                        <span class="opacity-75">Kelemahan:</span>
+                        <span id="enemyWeaknessText" class="font-bold">🔥 Eksotermik</span>
+                    </div>
+                    <div class="flex justify-between items-center text-rose-300">
+                        <span class="opacity-75">Aksi:</span>
+                        <span id="enemyIntentText" class="font-bold bg-rose-950/80 px-1.5 py-0.5 rounded border border-rose-500/30 truncate max-w-[140px]">🧪 Asam</span>
+                    </div>
+                </div>
+                <!-- Status Debuff Musuh -->
+                <div id="enemyBuffs" class="flex justify-end flex-wrap gap-1 mt-1 min-h-[16px]"></div>
+            </div>
+        </div>
+
+        <!-- Log Pertarungan & Penjelasan Reaksi Singkat di Bawah Arena -->
+        <div class="relative z-10 w-full max-w-3xl mx-auto px-3 mb-2 pointer-events-none flex flex-col gap-1">
+            <div id="scienceHintBox" class="bg-emerald-950/85 border border-emerald-500/40 px-3 py-1 rounded-lg text-center text-[11px] sm:text-xs text-emerald-200 shadow">
+                💡 <strong>Prinsip Sains:</strong> Gunakan Laser Foton untuk mengeksitasi elektron musuh & mengisi energi!
+            </div>
+            <div id="battleLog" class="glass-panel px-4 py-2 rounded-xl text-center text-xs sm:text-sm font-semibold text-cyan-100 shadow-md border border-cyan-500/20">
+                Selamat datang di Laboratorium Sektor 7! Bersiaplah menaklukkan 25 Bab Sains!
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Panel Kontrol Serangan Sains (Bawah - 5 Skill Interaktif) -->
+    <footer class="w-full bg-slate-900/95 border-t border-cyan-500/30 p-2 sm:p-3 z-20 shrink-0">
+        <div class="max-w-5xl mx-auto grid grid-cols-2 sm:grid-cols-5 gap-1.5 sm:gap-2.5">
+            
+            <!-- Skill 1: Sinar Laser Foton -->
+            <button id="btnSkill1" onclick="playerAction('laser')" class="action-btn flex flex-col items-center justify-center p-2 rounded-xl bg-gradient-to-br from-cyan-600 to-blue-800 hover:from-cyan-500 hover:to-blue-700 border border-cyan-400/50 shadow-lg text-white">
+                <div class="flex items-center gap-1 font-cyber text-[11px] sm:text-xs font-bold">
+                    <span>🔦</span> <span>Laser Foton</span>
+                </div>
+                <span class="text-[10px] text-cyan-200 mt-0.5">DMG 18 | +25 ⚡</span>
+            </button>
+
+            <!-- Skill 2: Reaksi Eksotermik -->
+            <button id="btnSkill2" onclick="playerAction('exothermic')" class="action-btn flex flex-col items-center justify-center p-2 rounded-xl bg-gradient-to-br from-orange-600 to-red-800 hover:from-orange-500 hover:to-red-700 border border-orange-400/50 shadow-lg text-white">
+                <div class="flex items-center gap-1 font-cyber text-[11px] sm:text-xs font-bold">
+                    <span>🔥</span> <span>Eksotermik</span>
+                </div>
+                <span class="text-[10px] text-orange-200 mt-0.5">DMG 36 + Bakar | -25 ⚡</span>
+            </button>
+
+            <!-- Skill 3: Katalis Asam-Basa -->
+            <button id="btnSkill3" onclick="playerAction('catalyst')" class="action-btn flex flex-col items-center justify-center p-2 rounded-xl bg-gradient-to-br from-lime-600 to-green-800 hover:from-lime-500 hover:to-green-700 border border-lime-400/50 shadow-lg text-white">
+                <div class="flex items-center gap-1 font-cyber text-[11px] sm:text-xs font-bold">
+                    <span>🧪</span> <span>Katalis Kimia</span>
+                </div>
+                <span class="text-[10px] text-lime-200 mt-0.5">DMG 28 + Korosi | -20 ⚡</span>
+            </button>
+
+            <!-- Skill 4: Perisai Medan Magnet -->
+            <button id="btnSkill4" onclick="playerAction('shield')" class="action-btn flex flex-col items-center justify-center p-2 rounded-xl bg-gradient-to-br from-emerald-600 to-teal-800 hover:from-emerald-500 hover:to-teal-700 border border-emerald-400/50 shadow-lg text-white">
+                <div class="flex items-center gap-1 font-cyber text-[11px] sm:text-xs font-bold">
+                    <span>🛡️</span> <span>Medan Magnet</span>
+                </div>
+                <span class="text-[10px] text-emerald-200 mt-0.5">Blok 75% +20 HP | -20 ⚡</span>
+            </button>
+
+            <!-- Skill 5: Ledakan Fusi Nuklir -->
+            <button id="btnSkill5" onclick="playerAction('fusion')" class="col-span-2 sm:col-span-1 action-btn flex flex-col items-center justify-center p-2 rounded-xl bg-gradient-to-br from-purple-600 to-indigo-900 hover:from-purple-500 hover:to-indigo-800 border border-purple-400/60 shadow-lg text-white">
+                <div class="flex items-center gap-1 font-cyber text-[11px] sm:text-xs font-bold">
+                    <span>☢️</span> <span>Fusi Nuklir</span>
+                </div>
+                <span class="text-[10px] text-purple-200 mt-0.5">DMG 70 + Stun | -60 ⚡</span>
+            </button>
+
+        </div>
+    </footer>
+
+    <!-- ========================================================================
+         MODAL 1: STORYLINE / INTRO / LEVEL TRANSITION
+         ======================================================================== -->
+    <div id="storyModal" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="glass-panel max-w-lg w-full rounded-2xl p-5 sm:p-7 border border-cyan-400/50 shadow-2xl text-center relative overflow-y-auto max-h-[92vh]">
+            <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-cyan-400 via-purple-500 to-rose-500"></div>
+            
+            <div id="modalBadge" class="inline-block px-3 py-1 rounded-full bg-cyan-500/20 text-cyan-300 font-cyber text-xs font-bold mb-2 border border-cyan-500/40">
+                BAB 1 / 10 • LABORATORIUM BIO-KIMIA
+            </div>
+            
+            <h2 id="modalTitle" class="font-cyber text-lg sm:text-2xl font-black text-white mb-2 tracking-wide">
+                KEBOCORAN ASAM SULFAT
+            </h2>
+            
+            <div id="modalIcon" class="text-4xl sm:text-5xl my-3 drop-shadow-[0_0_15px_rgba(56,189,248,0.6)]">
+                🧪
+            </div>
+            
+            <p id="modalStoryText" class="text-slate-300 text-xs sm:text-sm leading-relaxed mb-4">
+                Cerita misi...
+            </p>
+
+            <div id="modalCompanionBox" class="hidden bg-cyan-950/80 border border-cyan-400/50 rounded-xl p-3 mb-4 text-left">
+                <p class="text-[11px] font-bold text-cyan-300 uppercase tracking-wider mb-1">🤝 REKAN PEMBANTU BARU BERGABUNG!</p>
+                <p id="modalCompanionText" class="text-xs text-cyan-100"></p>
+            </div>
+
+            <div class="flex gap-2">
+                <button onclick="openWorkshopFromStory()" class="w-1/3 py-3 px-3 rounded-xl bg-amber-600/30 hover:bg-amber-600/50 border border-amber-400/50 font-cyber font-bold text-amber-200 text-xs transition">
+                    🤖 RUANG ROBOT
+                </button>
+                <button id="modalActionBtn" class="w-2/3 py-3 px-5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 font-cyber font-bold text-white text-xs sm:text-sm tracking-wider shadow-lg shadow-cyan-500/30 transition transform active:scale-95">
+                    MULAI PERTARUNGAN 🚀
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================================================
+         MODAL 2: RUANGAN ROBOTIK & SKUAD KARAKTER PEMBANTU
+         ======================================================================== -->
+    <div id="workshopModal" class="hidden fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="glass-panel max-w-2xl w-full rounded-2xl p-5 sm:p-6 border border-amber-400/50 shadow-2xl relative overflow-y-auto max-h-[92vh]">
+            <div class="flex justify-between items-center border-b border-slate-700 pb-3 mb-4">
+                <div>
+                    <h2 class="font-cyber text-lg sm:text-xl font-black text-amber-400">🏭 RUANGAN ROBOTIK & SKUAD</h2>
+                    <p class="text-xs text-slate-300">Rakit komponen <strong>Mecha-Bot</strong>, latih kalibrasi tempur, & pantau asisten kelipatan level!</p>
+                </div>
+                <button onclick="closeWorkshop()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs border border-slate-600">✕ Tutup</button>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4 bg-slate-900/90 p-3 rounded-xl border border-amber-500/30">
+                <div class="flex flex-col items-center justify-center border-b sm:border-b-0 sm:border-r border-slate-700 pb-2 sm:pb-0">
+                    <div id="robotPreviewIcon" class="text-4xl mb-1">🤖</div>
+                    <span id="robotBuildName" class="font-cyber text-xs font-bold text-cyan-300 text-center">MK-I PROTOTYPE</span>
+                    <button onclick="calibrateRobotRoom()" id="calibrateBtn" class="mt-2 px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[10px] shadow transition">
+                        ⚡ Kalibrasi (+10% Daya)
+                    </button>
+                </div>
+                <div class="sm:col-span-2 flex flex-col justify-center gap-1 text-xs">
+                    <div class="flex justify-between">
+                        <span class="text-slate-400">Bonus Pertahanan (Max HP):</span>
+                        <span id="statBonusHp" class="font-bold text-emerald-400">+20 HP</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-400">Serangan Otomatis Bot / Giliran:</span>
+                        <span id="statBotDmg" class="font-bold text-rose-400">10 DMG</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-400">Suplai Energi / Giliran:</span>
+                        <span id="statBotEnergy" class="font-bold text-amber-400">+5 ⚡</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-400">Level Kalibrasi Ruangan:</span>
+                        <span id="statCalibration" class="font-bold text-purple-300">Lv. 1 (1.0x)</span>
+                    </div>
+                    <p id="statBotSpecial" class="text-[11px] text-cyan-200 mt-1 italic">Efek Khusus: Menembakkan laser mikro setiap akhir giliranmu.</p>
+                </div>
+            </div>
+
+            <div class="space-y-3 text-xs mb-4">
+                <div>
+                    <label class="font-cyber font-bold text-cyan-300 block mb-1">1. RANGKA PELINDUNG (CHASSIS)</label>
+                    <div class="grid grid-cols-3 gap-2" id="chassisOptions"></div>
+                </div>
+                <div>
+                    <label class="font-cyber font-bold text-rose-300 block mb-1">2. MODUL SENJATA (WEAPON CORE)</label>
+                    <div class="grid grid-cols-3 gap-2" id="weaponOptions"></div>
+                </div>
+                <div>
+                    <label class="font-cyber font-bold text-amber-300 block mb-1">3. REAKTOR DAYA (POWER CORE)</label>
+                    <div class="grid grid-cols-3 gap-2" id="reactorOptions"></div>
+                </div>
+            </div>
+
+            <div class="bg-slate-900/80 p-3 rounded-xl border border-cyan-500/30 mb-4">
+                <h3 class="font-cyber text-xs font-bold text-cyan-300 mb-2">🛸 SKUAD ASISTEN KELIPATAN LEVEL (8 REKAN)</h3>
+                <div id="companionGrid" class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[10px]"></div>
+            </div>
+
+            <button onclick="applyRobotBuild()" class="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 font-cyber font-bold text-slate-950 text-xs sm:text-sm tracking-wider shadow-lg transition">
+                PASANG RAKITAN & KELUAR RUANGAN ⚙️
+            </button>
+        </div>
+    </div>
+
+    <!-- ========================================================================
+         MODAL 3: ENSIKLOPEDIA & PENJELASAN SAINS
+         ======================================================================== -->
+    <div id="scienceModal" class="hidden fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="glass-panel max-w-2xl w-full rounded-2xl p-5 sm:p-6 border border-emerald-400/50 shadow-2xl relative overflow-y-auto max-h-[92vh]">
+            <div class="flex justify-between items-center border-b border-slate-700 pb-3 mb-4">
+                <div>
+                    <h2 class="font-cyber text-lg sm:text-xl font-black text-emerald-400">🔬 ENSIKLOPEDIA SAINS LAB CLASH</h2>
+                    <p class="text-xs text-slate-300">Pahami konsep sains di balik setiap serangan & musuh untuk menang!</p>
+                </div>
+                <button onclick="closeScienceModal()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs border border-slate-600">✕ Tutup</button>
+            </div>
+
+            <div class="space-y-3 text-xs sm:text-sm text-slate-200">
+                <div class="p-3 rounded-xl bg-slate-900/90 border border-cyan-500/30">
+                    <h3 class="font-cyber font-bold text-cyan-300 mb-1">🔦 1. Sinar Laser Foton (Fisika Kuantum)</h3>
+                    <p class="text-xs text-slate-300"><strong>Konsep:</strong> <em>Light Amplification by Stimulated Emission of Radiation</em>. Foton koheren berenergi tinggi menumbuk elektron target sehingga melepaskan energi.</p>
+                </div>
+                <div class="p-3 rounded-xl bg-slate-900/90 border border-orange-500/30">
+                    <h3 class="font-cyber font-bold text-orange-300 mb-1">🔥 2. Reaksi Eksotermik (Termokimia)</h3>
+                    <p class="text-xs text-slate-300"><strong>Konsep:</strong> Reaksi kimia yang melepaskan kalor ke lingkungan, sangat efektif melelehkan struktur es kriogenik.</p>
+                </div>
+                <div class="p-3 rounded-xl bg-slate-900/90 border border-lime-500/30">
+                    <h3 class="font-cyber font-bold text-lime-300 mb-1">🧪 3. Katalis Kimia & Netralisasi (Kimia Larutan)</h3>
+                    <p class="text-xs text-slate-300"><strong>Konsep:</strong> Mempercepat laju reaksi untuk menetralkan cairan asam korosif dan merusak lapisan logam musuh.</p>
+                </div>
+                <div class="p-3 rounded-xl bg-slate-900/90 border border-emerald-500/30">
+                    <h3 class="font-cyber font-bold text-emerald-300 mb-1">🛡️ 4. Perisai Medan Magnet (Elektromagnetisme)</h3>
+                    <p class="text-xs text-slate-300"><strong>Konsep:</strong> Menggunakan Gaya Lorentz untuk membelokkan partikel bermuatan dan meredam 75% kerusakan masuk.</p>
+                </div>
+                <div class="p-3 rounded-xl bg-slate-900/90 border border-purple-500/30">
+                    <h3 class="font-cyber font-bold text-purple-300 mb-1">☢️ 5. Reaksi Fusi Nuklir (Fisika Inti)</h3>
+                    <p class="text-xs text-slate-300"><strong>Konsep:</strong> Penggabungan inti atom yang melepaskan energi raksasa E = mc², melumpuhkan sirkuit musuh seketika.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================================================
+         MODAL 4: TEKA-TEKI SAINS INTERAKTIF (SCIENCE PUZZLE OVERDRIVE)
+         ======================================================================== -->
+    <div id="puzzleModal" class="hidden fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="glass-panel max-w-lg w-full rounded-2xl p-5 sm:p-6 border border-indigo-400/60 shadow-2xl relative">
+            <div class="flex justify-between items-center border-b border-slate-700 pb-3 mb-3">
+                <span class="px-2.5 py-1 rounded-full bg-indigo-500/25 text-indigo-300 font-cyber text-xs font-bold border border-indigo-400/40">
+                    🧩 TEKA-TEKI SAINS • OVERDRIVE
+                </span>
+                <button onclick="closePuzzleModal()" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs">✕</button>
+            </div>
+
+            <h3 id="puzzleCategory" class="font-cyber text-xs font-bold text-cyan-400 mb-1">BIDANG: FISIKA & KIMIA</h3>
+            <p id="puzzleQuestion" class="text-sm sm:text-base font-semibold text-white mb-4 leading-relaxed">Pertanyaan...</p>
+            <div id="puzzleOptions" class="space-y-2 mb-4"></div>
+            <div id="puzzleFeedback" class="hidden p-3 rounded-xl text-xs font-semibold mb-3"></div>
+        </div>
+    </div>
+
+    <!-- ========================================================================
+         MODAL 5: KOMIK AKHIR LEVEL (END-OF-LEVEL COMIC STRIP)
+         ======================================================================== -->
+    <div id="comicModal" class="hidden fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-md flex items-center justify-center p-3 sm:p-5">
+        <div class="bg-slate-900 max-w-3xl w-full rounded-2xl p-4 sm:p-6 border-2 border-cyan-400 shadow-2xl overflow-y-auto max-h-[94vh]">
+            <div class="flex justify-between items-center mb-3">
+                <span id="comicHeaderBadge" class="px-3 py-1 rounded-full bg-amber-400 text-slate-950 font-cyber text-xs font-black tracking-wider">
+                    📖 KOMIK EPISODE SELESAI!
+                </span>
+                <span class="text-xs text-cyan-300 font-cyber font-bold">ARSIP VISUAL DR. PROTON</span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
+                <div class="comic-panel rounded-xl bg-gradient-to-br from-cyan-900 to-slate-900 p-3 flex flex-col justify-between min-h-[175px]">
+                    <div class="flex justify-between items-center">
+                        <span class="bg-slate-950 text-cyan-300 font-cyber text-[10px] px-2 py-0.5 rounded font-bold">PANEL 1</span>
+                        <span id="comicP1Icon" class="text-3xl">💥</span>
+                    </div>
+                    <div class="my-2 text-center text-4xl drop-shadow">🧑‍🔬⚡</div>
+                    <div class="comic-bubble p-2 text-[11px] font-bold leading-snug">
+                        <p id="comicP1Text">"Perhitungan energi tepat sasaran!"</p>
+                    </div>
+                </div>
+
+                <div class="comic-panel rounded-xl bg-gradient-to-br from-purple-900 to-slate-900 p-3 flex flex-col justify-between min-h-[175px]">
+                    <div class="flex justify-between items-center">
+                        <span class="bg-slate-950 text-purple-300 font-cyber text-[10px] px-2 py-0.5 rounded font-bold">PANEL 2</span>
+                        <span class="text-3xl">🤖</span>
+                    </div>
+                    <div class="my-2 text-center text-4xl drop-shadow">🔬📊</div>
+                    <div class="comic-bubble p-2 text-[11px] font-bold leading-snug">
+                        <p id="comicP2Text">"Mecha-Bot mencatat stabilitas inti kembali normal."</p>
+                    </div>
+                </div>
+
+                <div class="comic-panel rounded-xl bg-gradient-to-br from-rose-950 to-slate-900 p-3 flex flex-col justify-between min-h-[175px]">
+                    <div class="flex justify-between items-center">
+                        <span class="bg-slate-950 text-rose-300 font-cyber text-[10px] px-2 py-0.5 rounded font-bold">PANEL 3</span>
+                        <span class="text-3xl">🚨</span>
+                    </div>
+                    <div class="my-2 text-center text-4xl drop-shadow">📡⚠️</div>
+                    <div class="comic-bubble p-2 text-[11px] font-bold leading-snug">
+                        <p id="comicP3Text">"Sensor mendeteksi anomali baru di sektor selanjutnya!"</p>
+                    </div>
+                </div>
+            </div>
+
+            <button id="comicNextBtn" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-600 hover:from-emerald-400 hover:to-cyan-500 font-cyber font-black text-slate-950 text-xs sm:text-sm tracking-wider shadow-lg transition transform active:scale-95">
+                LANJUT KE BAB BERIKUTNYA ➡️
+            </button>
+        </div>
+    </div>
+
+    <script>
+        /**
+         * ============================================================================
+         * 1. SISTEM AUDIO PROSEDURAL (WEB AUDIO API)
+         * ============================================================================
+         */
+        class ScienceAudioEngine {
+            constructor() {
+                this.ctx = null;
+                this.isMuted = true;
+                this.bgmInterval = null;
+                this.step = 0;
+                this.currentTheme = 0;
+            }
+
+            init() {
+                if (!this.ctx) {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    this.ctx = new AudioContext();
+                }
+                if (this.ctx.state === 'suspended') {
+                    this.ctx.resume();
+                }
+            }
+
+            toggleAudio() {
+                this.init();
+                this.isMuted = !this.isMuted;
+                const icon = document.getElementById('audioIcon');
+                const text = document.getElementById('audioText');
+                
+                if (this.isMuted) {
+                    icon.textContent = '🔇';
+                    text.textContent = 'Off';
+                    this.stopBGM();
+                } else {
+                    icon.textContent = '🔊';
+                    text.textContent = 'On';
+                    this.playBGM(this.currentTheme);
+                    this.playSFX('ui');
+                }
+            }
+
+            playBGM(levelIndex) {
+                this.currentTheme = levelIndex;
+                this.stopBGM();
+                if (this.isMuted || !this.ctx) return;
+
+                const themes = [
+                    { tempo: 320, notes: [220, 261.63, 293.66, 329.63, 392.00, 329.63, 293.66, 246.94], wave: 'triangle' },
+                    { tempo: 240, notes: [146.83, 155.56, 185.00, 196.00, 220.00, 233.08, 196.00, 155.56], wave: 'sawtooth' },
+                    { tempo: 380, notes: [329.63, 415.30, 493.88, 622.25, 493.88, 415.30, 369.99, 493.88], wave: 'sine' },
+                    { tempo: 260, notes: [196.00, 246.94, 293.66, 369.99, 329.63, 293.66, 246.94, 196.00], wave: 'triangle' },
+                    { tempo: 210, notes: [130.81, 164.81, 196.00, 246.94, 261.63, 246.94, 196.00, 164.81], wave: 'sawtooth' },
+                    { tempo: 190, notes: [110, 110, 164.81, 174.61, 130.81, 146.83, 196.00, 103.83], wave: 'square' }
+                ];
+
+                const theme = themes[levelIndex % themes.length];
+                this.step = 0;
+
+                this.bgmInterval = setInterval(() => {
+                    if (this.isMuted || !this.ctx) return;
+                    const freq = theme.notes[this.step % theme.notes.length];
+                    this.playTone(freq, theme.wave, 0.16, 0.04);
+                    if (this.step % 4 === 0) {
+                        this.playTone(freq / 2, 'sine', 0.28, 0.07);
+                    }
+                    this.step++;
+                }, theme.tempo);
+            }
+
+            stopBGM() {
+                if (this.bgmInterval) {
+                    clearInterval(this.bgmInterval);
+                    this.bgmInterval = null;
+                }
+            }
+
+            playTone(freq, type, duration, volume) {
+                if (this.isMuted || !this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+                gain.gain.setValueAtTime(volume, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(this.ctx.currentTime + duration);
+            }
+
+            playSFX(type) {
+                if (this.isMuted || !this.ctx) return;
+                const now = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+
+                if (type === 'laser') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(880, now);
+                    osc.frequency.exponentialRampToValueAtTime(140, now + 0.22);
+                    gain.gain.setValueAtTime(0.14, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.22);
+                    osc.start(now);
+                    osc.stop(now + 0.22);
+                } else if (type === 'explosion') {
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(160, now);
+                    osc.frequency.exponentialRampToValueAtTime(35, now + 0.4);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+                    osc.start(now);
+                    osc.stop(now + 0.4);
+                } else if (type === 'shield') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(300, now);
+                    osc.frequency.linearRampToValueAtTime(620, now + 0.28);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.28);
+                    osc.start(now);
+                    osc.stop(now + 0.28);
+                } else if (type === 'fusion') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(100, now);
+                    osc.frequency.linearRampToValueAtTime(980, now + 0.3);
+                    osc.frequency.exponentialRampToValueAtTime(40, now + 0.65);
+                    gain.gain.setValueAtTime(0.22, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.65);
+                    osc.start(now);
+                    osc.stop(now + 0.65);
+                } else if (type === 'win') {
+                    const notes = [523.25, 659.25, 783.99, 1046.50];
+                    notes.forEach((n, i) => {
+                        setTimeout(() => this.playTone(n, 'triangle', 0.22, 0.14), i * 100);
+                    });
+                } else if (type === 'ui') {
+                    this.playTone(620, 'sine', 0.09, 0.09);
+                }
+            }
+        }
+
+        const audioEngine = new ScienceAudioEngine();
+        document.getElementById('toggleAudioBtn').addEventListener('click', () => audioEngine.toggleAudio());
+
+        /**
+         * ============================================================================
+         * 2. DATA PERAKITAN ROBOT, RUANG ROBOTIK & 8 KARAKTER PEMBANTU
+         * ============================================================================
+         */
+        const ROBOT_PARTS = {
+            chassis: [
+                { id: 'c_aero', name: 'Alloy Titanium', hp: 25, desc: '+25 Max HP', color: '#38bdf8' },
+                { id: 'c_lead', name: 'Perisai Timbal', hp: 55, desc: '+55 Max HP', color: '#94a3b8' },
+                { id: 'c_nano', name: 'Karbon Grafena', hp: 38, desc: '+38 HP & +5 DMG', bonusDmg: 5, color: '#a855f7' }
+            ],
+            weapon: [
+                { id: 'w_laser', name: 'Turret Foton', dmg: 12, desc: '+12 Bot DMG', effect: 'Laser Mikro', color: '#22d3ee' },
+                { id: 'w_flame', name: 'Penyembur Termal', dmg: 16, desc: '+16 Bot DMG', effect: 'Bakar +4/turn', burn: 4, color: '#f97316' },
+                { id: 'w_acid', name: 'Injektor Katalis', dmg: 14, desc: '+14 Bot DMG', effect: 'Korosi +4/turn', poison: 4, color: '#84cc16' }
+            ],
+            reactor: [
+                { id: 'r_solar', name: 'Sel Fotovoltaik', energy: 7, heal: 0, desc: '+7 ⚡ / turn' },
+                { id: 'r_bio', name: 'Generator Bio-ATP', energy: 4, heal: 8, desc: '+4 ⚡ & +8 HP/turn' },
+                { id: 'r_arc', name: 'Inti Fusi Mini', energy: 12, heal: 0, desc: '+12 ⚡ / turn' }
+            ]
+        };
+
+        let robotConfig = {
+            chassis: 'c_aero',
+            weapon: 'w_laser',
+            reactor: 'r_solar',
+            calibrationLevel: 1
+        };
+
+        const COMPANIONS = [
+            { unlockLevel: 3,  name: "DRONE MEDIS BIO-X",    icon: "🛸", color: "#34d399", bonusHp: 8,  bonusDmg: 0,  bonusEn: 0, desc: "Memulihkan +8 HP setiap giliran." },
+            { unlockLevel: 6,  name: "SENTRY TESLA COIL",    icon: "🛰️", color: "#facc15", bonusHp: 0,  bonusDmg: 12, bonusEn: 0, desc: "Menyambar musuh (+12 DMG) tiap giliran." },
+            { unlockLevel: 9,  name: "VALKYRIE KUANTUM",     icon: "🔮", color: "#c084fc", bonusHp: 0,  bonusDmg: 14, bonusEn: 6, desc: "+14 DMG & +6 Energi Plasma/giliran." },
+            { unlockLevel: 12, name: "ROVER SEISMIK",        icon: "🚜", color: "#fb923c", bonusHp: 5,  bonusDmg: 16, bonusEn: 0, desc: "Getaran tektonik +16 DMG & +5 HP." },
+            { unlockLevel: 15, name: "SATELIT HELIOS",       icon: "☀️", color: "#fde047", bonusHp: 0,  bonusDmg: 10, bonusEn: 8, desc: "Panel surya orbit: +8 ⚡ & +10 DMG." },
+            { unlockLevel: 18, name: "SWARM NANOBOT",        icon: "🦠", color: "#2dd4bf", bonusHp: 12, bonusDmg: 12, bonusEn: 0, desc: "Memperbaiki sel (+12 HP) & mengikis musuh (+12 DMG)." },
+            { unlockLevel: 21, name: "PRISMA KRONOS",        icon: "💎", color: "#60a5fa", bonusHp: 0,  bonusDmg: 20, bonusEn: 5, desc: "Refraksi cahaya tinggi (+20 DMG & +5 ⚡)." },
+            { unlockLevel: 24, name: "AVATAR SINGULARITAS",  icon: "🌌", color: "#f472b6", bonusHp: 15, bonusDmg: 25, bonusEn: 8, desc: "Rekan terkuat! +25 DMG, +15 HP, +8 ⚡/giliran!" }
+        ];
+
+        /**
+         * ============================================================================
+         * 3. BANK TEKA-TEKI SAINS
+         * ============================================================================
+         */
+        const SCIENCE_PUZZLES = [
+            {
+                category: "KIMIA LARUTAN",
+                q: "Zat apakah yang berfungsi mempercepat laju reaksi kimia tanpa ikut habis bereaksi?",
+                options: ["Katalis", "Isolator", "Endoterm", "Sedimen"],
+                answer: 0,
+                explain: "Benar! Katalis menurunkan energi aktivasi."
+            },
+            {
+                category: "FISIKA KUANTUM",
+                q: "Partikel elementer pembawa energi cahaya yang dipancarkan oleh senjata Laser adalah...",
+                options: ["Neutron", "Foton", "Positron", "Gluon"],
+                answer: 1,
+                explain: "Tepat! Foton adalah paket kuantum radiasi elektromagnetik."
+            },
+            {
+                category: "TERMOKIMIA",
+                q: "Reaksi kimia yang melepaskan kalor (panas) dari sistem ke lingkungan disebut reaksi...",
+                options: ["Endotermik", "Eksotermik", "Isotermik", "Katalitik"],
+                answer: 1,
+                explain: "Benar! Reaksi eksotermik menghasilkan energi panas."
+            },
+            {
+                category: "ELEKTROMAGNETISME",
+                q: "Gaya yang membelokkan partikel bermuatan listrik saat bergerak dalam medan magnet disebut...",
+                options: ["Gaya Gravitasi", "Gaya Lorentz", "Gaya Gesek", "Gaya Kapilaritas"],
+                answer: 1,
+                explain: "Tepat! Perisai Medan Magnet memanfaatkan Gaya Lorentz."
+            },
+            {
+                category: "FISIKA INTI",
+                q: "Proses penggabungan dua inti atom ringan menjadi inti yang lebih berat seperti di Matahari disebut...",
+                options: ["Fisi Nuklir", "Fusi Nuklir", "Ionisasi", "Sublimasi"],
+                answer: 1,
+                explain: "Luar biasa! Fusi nuklir melepaskan energi sangat besar sesuai E = mc²."
+            }
+        ];
+
+        /**
+         * ============================================================================
+         * 4. GENERATOR 25 LEVEL BERTINGKAT
+         * ============================================================================
+         */
+        const BASE_10_LEVELS = [
+            {
+                badge: "BAB 1 / 25 • LABORATORIUM BIO-KIMIA",
+                title: "KEBOCORAN ASAM SULFAT",
+                icon: "🧪",
+                story: "Tabung spesimen H2SO4 pecah dan membentuk <strong>Slime Asam Mutan</strong>. Gunakan <strong>Katalis Kimia</strong>!",
+                challenge: "Tantangan: Musuh menyemburkan asam korosif setiap 2 giliran.",
+                scienceTip: "Asam kuat dapat dinetralkan dengan reagen Katalis Kimia.",
+                weakness: "catalyst", weaknessLabel: "🧪 Katalis Kimia",
+                bgTheme: "chem_lab",
+                enemy: { name: "SLIME ASAM H2SO4", maxHp: 95, atk: 12, color: "#22c55e", shape: "slime", mechanic: "acid" },
+                comic: [
+                    "Katalis kimia berhasil menetralkan pH Slime Asam menjadi air dan garam netral!",
+                    "Mecha-Bot memindai residu cairan. Tidak ada lagi kebocoran asam.",
+                    "Tiba-tiba lampu laboratorium berkedip! Lonjakan listrik terdeteksi di Ruang Generator!"
+                ]
+            },
+            {
+                badge: "BAB 2 / 25 • RUANG GENERATOR PLASMA",
+                title: "GANGGUAN ELEKTROMAGNETIK",
+                icon: "⚡",
+                story: "<strong>Drone Tesla MK-II</strong> menyerap listrik statis dari kumparan raksasa.",
+                challenge: "Tantangan: Badai Plasma menguras 8 Energi Plasma setiap akhir giliran!",
+                scienceTip: "Gunakan Laser Foton untuk menembus pelindung elektromagnetik.",
+                weakness: "laser", weaknessLabel: "🔦 Laser Foton",
+                bgTheme: "plasma_core",
+                enemy: { name: "DRONE TESLA MK-II", maxHp: 125, atk: 14, color: "#38bdf8", shape: "drone", mechanic: "energy_drain" },
+                comic: [
+                    "Sinar laser foton memutus kumparan induksi Drone Tesla dengan presisi tinggi!",
+                    "Tegangan listrik di ruang generator kembali stabil pada frekuensi 50 Hz.",
+                    "Suhu ruangan mendadak anjlok drastis! Pintu Ruang Kriogenik terbuka membeku!"
+                ]
+            },
+            {
+                badge: "BAB 3 / 25 • FASILITAS KRIOGENIK",
+                title: "SUHU NOL MUTLAK (-273°C)",
+                icon: "❄️",
+                story: "<strong>Golem Kriogenik</strong> bangkit dari es superkonduktor. Rekan pertama, <strong>Drone Medis Bio-X</strong>, bergabung!",
+                challenge: "Tantangan: Golem memulihkan +12 HP/giliran. Lemah terhadap panas (Eksotermik)!",
+                scienceTip: "Reaksi Eksotermik melepaskan kalor yang meruntuhkan kristal es.",
+                weakness: "exothermic", weaknessLabel: "🔥 Eksotermik",
+                bgTheme: "cryo_chamber",
+                enemy: { name: "GOLEM KRIOGENIK", maxHp: 155, atk: 16, color: "#60a5fa", shape: "golem", mechanic: "cryo_regen" },
+                comic: [
+                    "Reaksi eksotermik melepaskan kalor hebat yang mencairkan seluruh kristal Golem!",
+                    "Drone Medis Bio-X menyemprotkan serum hangat untuk memulihkan suhu tubuh.",
+                    "Sinyal biologis aneh muncul dari Kubah Botani di lantai atas!"
+                ]
+            },
+            {
+                badge: "BAB 4 / 25 • KUBAH BOTANI MUTAGEN",
+                title: "SPORA RADIOTROFIK",
+                icon: "🍄",
+                story: "<strong>Hydra Spora</strong> menyebarkan racun biologis yang melemahkan pelindung sel.",
+                challenge: "Tantangan: Spora beracun memberikan kerusakan racun tambahan setiap giliran!",
+                scienceTip: "Suhu tinggi dari Reaksi Eksotermik mendenaturasi protein spora.",
+                weakness: "exothermic", weaknessLabel: "🔥 Eksotermik",
+                bgTheme: "bio_dome",
+                enemy: { name: "HYDRA SPORA X-9", maxHp: 185, atk: 18, color: "#a3e635", shape: "slime", mechanic: "acid" },
+                comic: [
+                    "Panas termal mendenaturasi enzim spora mutan hingga tak lagi beracun!",
+                    "Ekosistem kubah botani kini aman untuk penelitian tanaman oksigen.",
+                    "Getaran magnetik kuat mengguncang lantai dari Terowongan Maglev!"
+                ]
+            },
+            {
+                badge: "BAB 5 / 25 • TEROWONGAN LASER & MAGLEV",
+                title: "PENJAGA REL SUPERKONDUKTOR",
+                icon: "🧲",
+                story: "<strong>Colossus Ferromagnet</strong> memanipulasi medan magnetik.",
+                challenge: "Tantangan: Colossus melancarkan hantaman elektromagnetik besar!",
+                scienceTip: "Gunakan Katalis Kimia untuk mengoksidasi pelindung logam.",
+                weakness: "catalyst", weaknessLabel: "🧪 Katalis Kimia",
+                bgTheme: "laser_grid",
+                enemy: { name: "COLOSSUS MAGNET", maxHp: 215, atk: 20, color: "#f59e0b", shape: "golem", mechanic: "heavy_slam" },
+                comic: [
+                    "Reaksi oksidasi cepat membuat baja ferromagnetik Colossus rapuh dan runtuh!",
+                    "Rel kereta maglev kembali beroperasi normal untuk transportasi.",
+                    "Alarm panas bumi menyala merah! Reaktor Geotermal meluap!"
+                ]
+            },
+            {
+                badge: "BAB 6 / 25 • REAKTOR TERMAL MAGMA",
+                title: "PANAS BUMI GEOTERMAL",
+                icon: "🌋",
+                story: "<strong>Elemental Magma Silikat</strong> muncul. Rekan kedua, <strong>Sentry Tesla Coil</strong>, aktif!",
+                challenge: "Tantangan: Gunakan Laser Foton untuk menembus plasma silikat!",
+                scienceTip: "Foton berenergi tinggi menembus plasma magma tanpa terpengaruh suhu.",
+                weakness: "laser", weaknessLabel: "🔦 Laser Foton",
+                bgTheme: "magma_core",
+                enemy: { name: "ELEMENTAL SILIKAT", maxHp: 245, atk: 22, color: "#ef4444", shape: "slime", mechanic: "energy_drain" },
+                comic: [
+                    "Kombinasi Laser Foton dan Sentry Tesla membekukan aliran magma!",
+                    "Turbin geotermal kembali menghasilkan energi bersih untuk fasilitas.",
+                    "Kapsul lift membawa Dr. Proton menuju Stasiun Orbital!"
+                ]
+            },
+            {
+                badge: "BAB 7 / 25 • STASIUN ORBITAL NOL-GRAVITASI",
+                title: "DISTORSI GELOMBANG GRAVITASI",
+                icon: "🛰️",
+                story: "<strong>Sentinel Graviton</strong> membengkokkan ruang di sekitarnya di orbit bumi.",
+                challenge: "Tantangan: Gravitasi tinggi menguras 8 Energi Plasma setiap giliran.",
+                scienceTip: "Reaksi Fusi Nuklir menciptakan gelombang kejut inti.",
+                weakness: "fusion", weaknessLabel: "☢️ Fusi Nuklir",
+                bgTheme: "orbital_station",
+                enemy: { name: "SENTINEL GRAVITON", maxHp: 275, atk: 24, color: "#8b5cf6", shape: "drone", mechanic: "energy_drain" },
+                comic: [
+                    "Gelombang Fusi Nuklir menstabilkan kelengkungan ruang-waktu di Stasiun Orbital!",
+                    "Pemandangan lengkung biru Bumi terlihat jelas dari jendela observatorium.",
+                    "Sinyal sonar mendeteksi anomali tekanan tinggi dari Palung Laut Dalam!"
+                ]
+            },
+            {
+                badge: "BAB 8 / 25 • LABORATORIUM PALUNG LAUT",
+                title: "TEKANAN HIDROSTATIS EKSTREM",
+                icon: "🌊",
+                story: "<strong>Leviathan Tekanan</strong> menyerang kubah kaca laboratorium.",
+                challenge: "Tantangan: Gelombang sonik bertekanan tinggi menyerang.",
+                scienceTip: "Katalis Kimia mengubah komposisi air laut menjadi reaksi eksotermik.",
+                weakness: "catalyst", weaknessLabel: "🧪 Katalis Kimia",
+                bgTheme: "deep_ocean",
+                enemy: { name: "LEVIATHAN HIDRO", maxHp: 305, atk: 25, color: "#0ea5e9", shape: "boss", mechanic: "acid" },
+                comic: [
+                    "Tekanan hidrostatis berhasil dinetralkan! Kaca titanium tetap utuh.",
+                    "Sensor bioluminesensi laut dalam kembali merekam data spesies baru.",
+                    "Reaktor Kuantum Pusat mulai mengalami kebocoran dimensi!"
+                ]
+            },
+            {
+                badge: "BAB 9 / 25 • GERBANG INTI KUANTUM",
+                title: "WARDEN SINGULARITAS",
+                icon: "💠",
+                story: "<strong>Warden Kronos</strong> menjaga gerbang inti. Rekan ketiga, <strong>Valkyrie Kuantum</strong>, bergabung!",
+                challenge: "Tantangan: Warden meregenerasi +12 HP per giliran!",
+                scienceTip: "Gunakan Reaksi Eksotermik untuk menghentikan regenerasi kristal.",
+                weakness: "exothermic", weaknessLabel: "🔥 Eksotermik",
+                bgTheme: "quantum_void",
+                enemy: { name: "WARDEN KRONOS", maxHp: 335, atk: 27, color: "#06b6d4", shape: "golem", mechanic: "cryo_regen" },
+                comic: [
+                    "Valkyrie Kuantum dan Dr. Proton meruntuhkan perisai kronos sang penjaga!",
+                    "Gerbang menuju inti superkomputer kini terbuka lebar.",
+                    "15 sektor eksperimen lanjutan menanti untuk ditaklukkan!"
+                ]
+            },
+            {
+                badge: "BAB 10 / 25 • INTI PROTOTYPE OMEGA",
+                title: "KEBANGKITAN OMEGA-ATOM MK-I",
+                icon: "🌌",
+                story: "Sub-inti <strong>OMEGA-ATOM MK-I</strong> menghadang di ujung sektor awal!",
+                challenge: "Tantangan Boss: Memicu Ledakan Kuantum setiap 3 giliran!",
+                scienceTip: "Kumpulkan energi, tahan dengan Magnet, akhiri dengan Fusi Nuklir!",
+                weakness: "fusion", weaknessLabel: "☢️ Fusi Nuklir",
+                bgTheme: "quantum_void",
+                enemy: { name: "OMEGA-ATOM MK-I", maxHp: 370, atk: 28, color: "#c084fc", shape: "boss", mechanic: "quantum_boss" },
+                comic: [
+                    "OMEGA-ATOM MK-I berhasil dilumpuhkan! Namun intinya melarikan diri ke Sektor 11!",
+                    "Dr. Proton meng-upgrade seluruh sistem laboratorium untuk ekspedisi hingga Bab 25!",
+                    "Perjalanan sains sejati baru saja memasuki fase paling menantang!"
+                ]
+            }
+        ];
+
+        const ADVANCED_15_SPECS = [
+            { title: "BADAI IONOSFER", sector: "ATMOSFER STRATOSFER", icon: "🌩️", theme: "orbital_station", enemy: "TITAN IONOSFER", shape: "drone", color: "#38bdf8", weak: "laser", weakLabel: "🔦 Laser Foton", mech: "energy_drain", tip: "Ion bermuatan di atmosfer atas sensitif terhadap eksitasi Laser Foton." },
+            { title: "SARANG NANOBOT", sector: "PABRIK NANOTEKNOLOGI", icon: "🦠", theme: "laser_grid", enemy: "RATU NANOBOT", shape: "slime", color: "#14b8a6", weak: "catalyst", weakLabel: "🧪 Katalis Kimia", mech: "acid", tip: "Pelarut Katalis Kimia memutus ikatan molekuler antar-nanobot." },
+            { title: "KRISTAL PIEZO", sector: "GUA GEOLOGI KRISTAL", icon: "💎", theme: "cryo_chamber", enemy: "GOLEM KUARSA", shape: "golem", color: "#818cf8", weak: "exothermic", weakLabel: "🔥 Eksotermik", mech: "cryo_regen", tip: "Pemanasan mendadak memicu pemuaian termal kristal kuarsa." },
+            { title: "REAKTOR TOKAMAK", sector: "FASILITAS FUSI BINTANG", icon: "☀️", theme: "magma_core", enemy: "SOLAR FLARE CORE", shape: "boss", color: "#f97316", weak: "fusion", weakLabel: "☢️ Fusi Nuklir", mech: "quantum_boss", tip: "Gunakan resonansi Fusi Nuklir untuk menyelaraskan tokamak." },
+            { title: "BIOSFER ABYSSAL", sector: "PALUNG MARIANA II", icon: "🦑", theme: "deep_ocean", enemy: "KRAKEN ABYSS", shape: "slime", color: "#22d3ee", weak: "exothermic", weakLabel: "🔥 Eksotermik", mech: "acid", tip: "Gelombang panas mendidihkan cairan bioluminesensi sekitar." },
+            { title: "LAB SUPERKONDUKTOR", sector: "TEROWONGAN PARTIKEL LHC", icon: "🔄", theme: "plasma_core", enemy: "AKSELERATOR HADRON", shape: "drone", color: "#a855f7", weak: "catalyst", weakLabel: "🧪 Katalis Kimia", mech: "heavy_slam", tip: "Katalis mengacaukan aliran pendingin helium cair." },
+            { title: "MATERI GELAP", sector: "OBSERVATORIUM KOSMIK", icon: "🌑", theme: "quantum_void", enemy: "SPECTRE DARK MATTER", shape: "boss", color: "#6366f1", weak: "laser", weakLabel: "🔦 Laser Foton", mech: "energy_drain", tip: "Foton berintensitas tinggi menyingkap posisi materi gelap." },
+            { title: "BENTENG POLIMER", sector: "GALANGAN MECHA BERAT", icon: "🛡️", theme: "laser_grid", enemy: "JUGGERNAUT", shape: "golem", color: "#eab308", weak: "catalyst", weakLabel: "🧪 Katalis Kimia", mech: "heavy_slam", tip: "Reagen Katalis memecah rantai polimer panjang." },
+            { title: "BADAI GAMMA", sector: "SATELIT PULSAR", icon: "📡", theme: "orbital_station", enemy: "AVATAR PULSAR", shape: "drone", color: "#ec4899", weak: "fusion", weakLabel: "☢️ Fusi Nuklir", mech: "quantum_boss", tip: "Ledakan Fusi menetralkan semburan sinar gamma." },
+            { title: "KILANG METANA", sector: "BULAN TITAN", icon: "🪐", theme: "cryo_chamber", enemy: "LEVIATHAN METANA", shape: "slime", color: "#34d399", weak: "exothermic", weakLabel: "🔥 Eksotermik", mech: "cryo_regen", tip: "Metana cair menguap hebat saat terkena Eksotermik!" },
+            { title: "INTI MANTEL BUMI", sector: "BOR GEOLOGI 15 KM", icon: "🌋", theme: "magma_core", enemy: "COLOSSUS MAGMA", shape: "golem", color: "#dc2626", weak: "laser", weakLabel: "🔦 Laser Foton", mech: "heavy_slam", tip: "Laser Foton terfokus memotong batuan basal pijar." },
+            { title: "LAB KROMOSOM", sector: "MENARA BIO-SINTESIS", icon: "🧬", theme: "bio_dome", enemy: "CHIMERA HELIX", shape: "boss", color: "#84cc16", weak: "catalyst", weakLabel: "🧪 Katalis Kimia", mech: "acid", tip: "Katalis enzim mengurai struktur heliks ganda sintetis." },
+            { title: "HORIZON PERISTIWA", sector: "LUBANG HITAM", icon: "🕳️", theme: "quantum_void", enemy: "PENJAGA SINGULARITAS", shape: "drone", color: "#c084fc", weak: "fusion", weakLabel: "☢️ Fusi Nuklir", mech: "energy_drain", tip: "Hanya energi Fusi Nuklir yang cukup untuk lolos gravitasi!" },
+            { title: "GARDA KRONOS", sector: "BENTENG TERAKHIR AI", icon: "⚔️", theme: "plasma_core", enemy: "ARCHON NEURAL", shape: "golem", color: "#f43f5e", weak: "exothermic", weakLabel: "🔥 Eksotermik", mech: "cryo_regen", tip: "Panas berlebih melumpuhkan prosesor superkomputer Archon!" },
+            { title: "TAHTA SINGULARITAS", sector: "PUSAT SEMESTA SAINS", icon: "👑", theme: "quantum_void", enemy: "OMEGA-PRIME GOD AI", shape: "boss", color: "#facc15", weak: "fusion", weakLabel: "☢️ Fusi Nuklir", mech: "quantum_boss", tip: "Pertarungan terakhir Bab 25! Kerahkan seluruh skuad asisten dan Fusi Nuklir!" }
+        ];
+
+        const LEVELS = [...BASE_10_LEVELS.map((lvl, idx) => ({ ...lvl, id: idx + 1 }))];
+
+        ADVANCED_15_SPECS.forEach((spec, idx) => {
+            const lvlNum = 11 + idx;
+            const hp = 390 + (idx * 32);
+            const atk = 29 + Math.floor(idx * 1.4);
+            const compUnlock = COMPANIONS.find(c => c.unlockLevel === lvlNum);
+
+            LEVELS.push({
+                id: lvlNum,
+                badge: `BAB ${lvlNum} / 25 • ${spec.sector}`,
+                title: spec.title,
+                icon: spec.icon,
+                story: `Ekspedisi mencapai <strong>${spec.sector}</strong>! <strong>${spec.enemy}</strong> muncul.${compUnlock ? ` Rekan <strong>${compUnlock.name}</strong> bergabung!` : ''}`,
+                challenge: `Tantangan Bab ${lvlNum}: ${spec.enemy} (${hp} HP) lemah terhadap ${spec.weakLabel}!`,
+                scienceTip: spec.tip,
+                weakness: spec.weak,
+                weaknessLabel: spec.weakLabel,
+                bgTheme: spec.theme,
+                enemy: { name: spec.enemy, maxHp: hp, atk: atk, color: spec.color, shape: spec.shape, mechanic: spec.mech },
+                comic: [
+                    `Sektor ${spec.sector} berhasil diamankan! Hukum sains terbukti perkasa!`,
+                    `Skuad asisten mengumpulkan sampel energi murni dari ${spec.enemy}.`,
+                    lvlNum < 25 ? `Koordinat Bab ${lvlNum + 1} terkunci! Bersiap maju!` : `SELURUH 25 BAB DITAKLUKKAN! Perdamaian dunia sains terwujud!`
+                ]
+            });
+        });
+
+        /**
+         * ============================================================================
+         * 5. STATE GAME & LOGIKA UTAMA
+         * ============================================================================
+         */
+        let currentLevelIdx = 0;
+        let isPlayerTurn = true;
+        let isGameOver = false;
+        let turnCount = 1;
+        let lastSkillUsed = null;
+        let overdriveTurns = 0;
+
+        const player = {
+            baseMaxHp: 100,
+            maxHp: 100,
+            hp: 100,
+            maxEnergy: 100,
+            energy: 50,
+            shieldActive: false,
+            xOffset: 0
+        };
+
+        let enemy = {
+            name: "",
+            maxHp: 95,
+            hp: 95,
+            atk: 12,
+            stunned: false,
+            burnTurns: 0,
+            poisonTurns: 0,
+            xOffset: 0
+        };
+
+        let particles = [];
+        let projectiles = [];
+        let shockwaves = [];
+        let floatingTexts = [];
+        let bgParticles = [];
+
+        function getRobotStats() {
+            const c = ROBOT_PARTS.chassis.find(i => i.id === robotConfig.chassis);
+            const w = ROBOT_PARTS.weapon.find(i => i.id === robotConfig.weapon);
+            const r = ROBOT_PARTS.reactor.find(i => i.id === robotConfig.reactor);
+            const mult = 1 + ((robotConfig.calibrationLevel - 1) * 0.1);
+            return {
+                chassis: c,
+                weapon: w,
+                reactor: r,
+                bonusHp: Math.round(c.hp * mult),
+                botDmg: Math.round((w.dmg + (c.bonusDmg || 0)) * mult),
+                botEnergy: r.energy,
+                botHeal: r.heal || 0,
+                mult: mult
+            };
+        }
+
+        function calibrateRobotRoom() {
+            audioEngine.playSFX('shield');
+            if (robotConfig.calibrationLevel < 10) {
+                robotConfig.calibrationLevel++;
+                renderWorkshopUI();
+            }
+        }
+
+        function renderWorkshopUI() {
+            const renderGroup = (containerId, items, category) => {
+                const el = document.getElementById(containerId);
+                el.innerHTML = items.map(item => {
+                    const isSelected = robotConfig[category] === item.id;
+                    return `
+                        <button onclick="selectRobotPart('${category}', '${item.id}')" 
+                            class="p-2 rounded-xl border text-left transition ${isSelected ? 'bg-cyan-500/25 border-cyan-400 text-white shadow-md' : 'bg-slate-800/80 border-slate-700 text-slate-400 hover:border-slate-500'}">
+                            <div class="font-bold text-[11px] truncate">${item.name}</div>
+                            <div class="text-[10px] text-amber-300 mt-0.5">${item.desc}</div>
+                        </button>
+                    `;
+                }).join('');
+            };
+
+            renderGroup('chassisOptions', ROBOT_PARTS.chassis, 'chassis');
+            renderGroup('weaponOptions', ROBOT_PARTS.weapon, 'weapon');
+            renderGroup('reactorOptions', ROBOT_PARTS.reactor, 'reactor');
+
+            const stats = getRobotStats();
+            document.getElementById('robotBuildName').textContent = `${stats.chassis.name.split(' ')[1]} • ${stats.weapon.name.split(' ')[1]}`.toUpperCase();
+            document.getElementById('statBonusHp').textContent = `+${stats.bonusHp} HP`;
+            document.getElementById('statBotDmg').textContent = `${stats.botDmg} DMG / giliran`;
+            document.getElementById('statBotEnergy').textContent = `+${stats.botEnergy} ⚡ ${stats.botHeal > 0 ? `& +${stats.botHeal} HP` : ''}`;
+            document.getElementById('statCalibration').textContent = `Lv. ${robotConfig.calibrationLevel}/10 (${stats.mult.toFixed(1)}x)`;
+            document.getElementById('statBotSpecial').textContent = `Efek Senjata: ${stats.weapon.effect}`;
+
+            const compGrid = document.getElementById('companionGrid');
+            const currentLvl = currentLevelIdx + 1;
+            compGrid.innerHTML = COMPANIONS.map(comp => {
+                const unlocked = currentLvl >= comp.unlockLevel;
+                return `
+                    <div class="p-2 rounded-lg border ${unlocked ? 'bg-cyan-950/70 border-cyan-400/50 text-cyan-100' : 'bg-slate-950/80 border-slate-800 text-slate-500'}">
+                        <div class="flex items-center justify-between mb-0.5">
+                            <span class="text-base">${unlocked ? comp.icon : '🔒'}</span>
+                            <span class="font-cyber font-bold text-[9px] px-1.5 py-0.5 rounded ${unlocked ? 'bg-emerald-500/20 text-emerald-300' : 'bg-slate-800 text-slate-400'}">BAB ${comp.unlockLevel}</span>
+                        </div>
+                        <div class="font-bold truncate">${comp.name}</div>
+                        <div class="text-[9px] opacity-80 leading-tight mt-0.5">${comp.desc}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function selectRobotPart(category, id) {
+            audioEngine.playSFX('ui');
+            robotConfig[category] = id;
+            renderWorkshopUI();
+        }
+
+        function openWorkshop() {
+            audioEngine.playSFX('ui');
+            renderWorkshopUI();
+            document.getElementById('workshopModal').classList.remove('hidden');
+        }
+
+        function openWorkshopFromStory() { openWorkshop(); }
+
+        function closeWorkshop() {
+            audioEngine.playSFX('ui');
+            document.getElementById('workshopModal').classList.add('hidden');
+        }
+
+        function applyRobotBuild() {
+            audioEngine.playSFX('shield');
+            const stats = getRobotStats();
+            const oldMax = player.maxHp;
+            player.maxHp = player.baseMaxHp + stats.bonusHp;
+            player.hp = Math.min(player.maxHp, player.hp + Math.max(0, player.maxHp - oldMax));
+            updateHUD();
+            closeWorkshop();
+            setBattleLog(`🏭 Ruangan Robotik: <strong>Mecha-Bot</strong> siap tempur (+${stats.bonusHp} Max HP)!`);
+        }
+
+        document.getElementById('workshopBtn').addEventListener('click', openWorkshop);
+        document.getElementById('scienceBtn').addEventListener('click', () => {
+            audioEngine.playSFX('ui');
+            document.getElementById('scienceModal').classList.remove('hidden');
+        });
+        function closeScienceModal() {
+            audioEngine.playSFX('ui');
+            document.getElementById('scienceModal').classList.add('hidden');
+        }
+
+        // --- TEKA-TEKI SAINS ---
+        let currentPuzzle = null;
+        document.getElementById('puzzleBtn').addEventListener('click', openPuzzleModal);
+
+        function openPuzzleModal() {
+            if (isGameOver) return;
+            audioEngine.playSFX('ui');
+            currentPuzzle = SCIENCE_PUZZLES[Math.floor(Math.random() * SCIENCE_PUZZLES.length)];
+            document.getElementById('puzzleCategory').textContent = `BIDANG: ${currentPuzzle.category}`;
+            document.getElementById('puzzleQuestion').textContent = currentPuzzle.q;
+            const fb = document.getElementById('puzzleFeedback');
+            fb.classList.add('hidden');
+
+            const optContainer = document.getElementById('puzzleOptions');
+            optContainer.innerHTML = currentPuzzle.options.map((opt, idx) => `
+                <button onclick="answerPuzzle(${idx})" class="w-full text-left p-3 rounded-xl bg-slate-800/90 hover:bg-indigo-600/40 border border-slate-600 hover:border-indigo-400 text-xs sm:text-sm font-semibold text-white transition">
+                    ${String.fromCharCode(65 + idx)}. ${opt}
+                </button>
+            `).join('');
+
+            document.getElementById('puzzleModal').classList.remove('hidden');
+        }
+
+        function closePuzzleModal() {
+            audioEngine.playSFX('ui');
+            document.getElementById('puzzleModal').classList.add('hidden');
+        }
+
+        function answerPuzzle(selectedIdx) {
+            const fb = document.getElementById('puzzleFeedback');
+            fb.classList.remove('hidden');
+            const buttons = document.getElementById('puzzleOptions').querySelectorAll('button');
+            buttons.forEach(b => b.disabled = true);
+
+            if (selectedIdx === currentPuzzle.answer) {
+                audioEngine.playSFX('win');
+                overdriveTurns = 2;
+                player.energy = Math.min(player.maxEnergy, player.energy + 35);
+                fb.className = "p-3 rounded-xl text-xs font-semibold mb-3 bg-emerald-950 border border-emerald-400 text-emerald-200";
+                fb.innerHTML = `✅ <strong>BENAR!</strong> ${currentPuzzle.explain}<br><span class="text-amber-300 mt-1 block">⚡ BONUS OVERDRIVE AKTIF!</span>`;
+                updateHUD();
+                setBattleLog(`🧩 <strong>Teka-Teki Terpecahkan!</strong> Mode <em>Science Overdrive</em> aktif!`);
+            } else {
+                audioEngine.playSFX('explosion');
+                fb.className = "p-3 rounded-xl text-xs font-semibold mb-3 bg-rose-950 border border-rose-400 text-rose-200";
+                fb.innerHTML = `❌ <strong>Kurang Tepat!</strong> Jawaban benar: <strong>${currentPuzzle.options[currentPuzzle.answer]}</strong>.`;
+            }
+
+            setTimeout(() => {
+                closePuzzleModal();
+            }, 2200);
+        }
+
+        /**
+         * ============================================================================
+         * 6. RENDERING CANVAS & EFEK VISUAL
+         * ============================================================================
+         */
+        const canvas = document.getElementById('arenaCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            const container = document.getElementById('gameContainer');
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
+            initBgParticles();
+        }
+        window.addEventListener('resize', resizeCanvas);
+
+        function initBgParticles() {
+            bgParticles = [];
+            const count = Math.floor(canvas.width / 20);
+            for (let i = 0; i < count; i++) {
+                bgParticles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    r: Math.random() * 3.5 + 1.5,
+                    vx: (Math.random() - 0.5) * 0.9,
+                    vy: (Math.random() - 0.5) * 0.9 - 0.25,
+                    alpha: Math.random() * 0.65 + 0.2
+                });
+            }
+        }
+
+        function drawBackground(theme, time) {
+            const w = canvas.width;
+            const h = canvas.height;
+            const floorY = h * 0.78;
+
+            if (theme === 'chem_lab') {
+                const grad = ctx.createLinearGradient(0, 0, 0, h);
+                grad.addColorStop(0, '#041f1e'); grad.addColorStop(0.7, '#064e3b'); grad.addColorStop(1, '#022c22');
+                ctx.fillStyle = grad; ctx.fillRect(0, 0, w, h);
+                ctx.fillStyle = '#062c24'; ctx.fillRect(0, floorY, w, h - floorY);
+                ctx.strokeStyle = 'rgba(52, 211, 153, 0.35)'; ctx.beginPath(); ctx.moveTo(0, floorY); ctx.lineTo(w, floorY); ctx.stroke();
+            } else if (theme === 'plasma_core') {
+                const grad = ctx.createLinearGradient(0, 0, 0, h);
+                grad.addColorStop(0, '#090d26'); grad.addColorStop(0.7, '#1e1b4b'); grad.addColorStop(1, '#0f172a');
+                ctx.fillStyle = grad; ctx.fillRect(0, 0, w, h);
+                ctx.fillStyle = '#0f172a'; ctx.fillRect(0, floorY, w, h - floorY);
+                ctx.strokeStyle = '#38bdf8'; ctx.beginPath(); ctx.moveTo(0, floorY); ctx.lineTo(w, floorY); ctx.stroke();
+            } else if (theme === 'cryo_chamber') {
+                const grad = ctx.createLinearGradient(0, 0, 0, h);
+                grad.addColorStop(0, '#082f49'); grad.addColorStop(0.7, '#0c4a6e'); grad.addColorStop(1, '#0f172a');
+                ctx.fillStyle = grad; ctx.fillRect(0, 0, w, h);
+                ctx.fillStyle = '#075985'; ctx.fillRect(0, floorY, w, h - floorY);
+                ctx.strokeStyle = '#bae6fd'; ctx.beginPath(); ctx.moveTo(0, floorY); ctx.lineTo(w, floorY); ctx.stroke();
+            } else if (theme === 'orbital_station') {
+                const grad = ctx.createLinearGradient(0, 0, 0, h);
+                grad.addColorStop(0, '#02040a'); grad.addColorStop(0.7, '#0f172a'); grad.addColorStop(1, '#1e293b');
+                ctx.fillStyle = grad; ctx.fillRect(0, 0, w, h);
+                ctx.beginPath(); ctx.arc(w * 0.5, h * 0.95, w * 0.42, Math.PI, 0);
+                ctx.fillStyle = 'rgba(14, 165, 233, 0.22)'; ctx.fill();
+                ctx.fillStyle = '#1e293b'; ctx.fillRect(0, floorY, w, h - floorY);
+                ctx.strokeStyle = '#94a3b8'; ctx.beginPath(); ctx.moveTo(0, floorY); ctx.lineTo(w, floorY); ctx.stroke();
+            } else if (theme === 'deep_ocean') {
+                const grad = ctx.createLinearGradient(0, 0, 0, h);
+                grad.addColorStop(0, '#021324'); grad.addColorStop(0.6, '#033659'); grad.addColorStop(1, '#041f33');
+                ctx.fillStyle = grad; ctx.fillRect(0, 0, w, h);
+                ctx.fillStyle = '#052e47'; ctx.fillRect(0, floorY, w, h - floorY);
+                ctx.strokeStyle = '#22d3ee'; ctx.beginPath(); ctx.moveTo(0, floorY); ctx.lineTo(w, floorY); ctx.stroke();
+            } else if (theme === 'laser_grid') {
+                ctx.fillStyle = '#070b19'; ctx.fillRect(0, 0, w, h);
+                ctx.fillStyle = '#111827'; ctx.fillRect(0, floorY, w, h - floorY);
+                ctx.strokeStyle = '#f43f5e'; ctx.beginPath(); ctx.moveTo(0, floorY); ctx.lineTo(w, floorY); ctx.stroke();
+            } else {
+                const grad = ctx.createRadialGradient(w / 2, h * 0.4, 20, w / 2, h * 0.4, w * 0.8);
+                grad.addColorStop(0, '#3b0764'); grad.addColorStop(0.5, '#1e1035'); grad.addColorStop(1, '#05050a');
+                ctx.fillStyle = grad; ctx.fillRect(0, 0, w, h);
+                ctx.fillStyle = '#140c24'; ctx.fillRect(0, floorY, w, h - floorY);
+                ctx.strokeStyle = '#c084fc'; ctx.beginPath(); ctx.moveTo(0, floorY); ctx.lineTo(w, floorY); ctx.stroke();
+            }
+
+            bgParticles.forEach(p => {
+                p.x += p.vx; p.y += p.vy;
+                if (p.y < 0) p.y = floorY;
+                if (p.x < 0) p.x = w;
+                if (p.x > w) p.x = 0;
+
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(56, 189, 248, ${p.alpha})`;
+                ctx.fill();
+            });
+        }
+
+        function drawPlayerAndSquad(time) {
+            const w = canvas.width;
+            const h = canvas.height;
+            const floorY = h * 0.78;
+            const px = w * 0.20 + player.xOffset;
+            const bob = Math.sin(time * 0.005) * 4;
+            const py = floorY - 55 + bob;
+
+            ctx.save();
+            if (overdriveTurns > 0) {
+                ctx.beginPath();
+                ctx.arc(px + 10, py + 15, 72 + Math.sin(time * 0.015) * 5, 0, Math.PI * 2);
+                ctx.strokeStyle = '#facc15'; ctx.lineWidth = 2.5; ctx.setLineDash([6, 4]); ctx.stroke();
+            }
+
+            ctx.fillStyle = 'rgba(0,0,0,0.4)';
+            ctx.beginPath(); ctx.ellipse(px, floorY, 30, 8, 0, 0, Math.PI * 2); ctx.fill();
+
+            ctx.fillStyle = '#f8fafc';
+            ctx.beginPath(); ctx.moveTo(px - 20, py + 50); ctx.lineTo(px - 14, py + 5); ctx.lineTo(px + 14, py + 5); ctx.lineTo(px + 20, py + 50); ctx.closePath(); ctx.fill();
+            ctx.fillStyle = '#06b6d4'; ctx.fillRect(px - 4, py + 8, 8, 35);
+
+            ctx.fillStyle = '#fed7aa'; ctx.beginPath(); ctx.arc(px, py - 10, 15, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = '#0284c7'; ctx.fillRect(px - 13, py - 15, 26, 8);
+
+            // Mecha-Bot
+            const rStats = getRobotStats();
+            const bx = px + 46;
+            const by = floorY - 32 + Math.sin(time * 0.007) * 5;
+            ctx.fillStyle = rStats.chassis.color; ctx.fillRect(bx - 14, by - 14, 28, 26);
+            ctx.strokeStyle = '#0f172a'; ctx.lineWidth = 2; ctx.strokeRect(bx - 14, by - 14, 28, 26);
+            ctx.fillStyle = '#fef08a'; ctx.fillRect(bx - 8, by - 8, 16, 5);
+            ctx.fillStyle = rStats.weapon.color; ctx.fillRect(bx - 4, by - 22, 18, 7);
+
+            // Asisten Skuad
+            const activeCompanions = COMPANIONS.filter(c => (currentLevelIdx + 1) >= c.unlockLevel);
+            activeCompanions.forEach((comp, idx) => {
+                const col = idx % 4;
+                const row = Math.floor(idx / 4);
+                const cx = px - 35 + (col * 30);
+                const cy = py - 56 - (row * 26) + Math.sin(time * 0.006 + idx) * 5;
+                ctx.beginPath(); ctx.arc(cx, cy, 10, 0, Math.PI * 2);
+                ctx.fillStyle = '#1e293b'; ctx.fill();
+                ctx.strokeStyle = comp.color; ctx.lineWidth = 2; ctx.stroke();
+            });
+
+            if (player.shieldActive) {
+                ctx.beginPath();
+                ctx.arc(px + 15, py + 10, 64, 0, Math.PI * 2);
+                ctx.strokeStyle = '#10b981'; ctx.lineWidth = 3; ctx.stroke();
+                ctx.fillStyle = 'rgba(16, 185, 129, 0.14)'; ctx.fill();
+            }
+            ctx.restore();
+        }
+
+        function drawEnemy(time) {
+            const levelData = LEVELS[currentLevelIdx];
+            const eData = levelData.enemy;
+            const w = canvas.width;
+            const h = canvas.height;
+            const floorY = h * 0.78;
+            const ex = w * 0.77 + enemy.xOffset;
+            const hover = Math.sin(time * 0.004) * 6;
+            const ey = floorY - 60 + hover;
+
+            ctx.save();
+            ctx.fillStyle = 'rgba(0,0,0,0.45)';
+            ctx.beginPath(); ctx.ellipse(ex, floorY, 38, 10, 0, 0, Math.PI * 2); ctx.fill();
+
+            if (eData.shape === 'slime') {
+                ctx.fillStyle = eData.color;
+                ctx.beginPath(); ctx.arc(ex, floorY - 25, 36, Math.PI, 0); ctx.fill();
+            } else if (eData.shape === 'drone') {
+                ctx.fillStyle = '#1e293b'; ctx.beginPath(); ctx.arc(ex, ey, 34, 0, Math.PI * 2); ctx.fill();
+                ctx.strokeStyle = eData.color; ctx.lineWidth = 4; ctx.stroke();
+            } else if (eData.shape === 'golem') {
+                ctx.fillStyle = eData.color; ctx.fillRect(ex - 32, floorY - 85, 64, 80);
+            } else {
+                ctx.translate(ex, ey - 10);
+                ctx.fillStyle = '#1e1b4b'; ctx.beginPath(); ctx.arc(0, 0, 28, 0, Math.PI * 2); ctx.fill();
+            }
+
+            if (enemy.stunned) {
+                ctx.fillStyle = '#facc15'; ctx.font = 'bold 14px Orbitron'; ctx.textAlign = 'center';
+                ctx.fillText('⚡ STUNNED ⚡', ex, ey - 65);
+            }
+            ctx.restore();
+        }
+
+        function spawnProjectile(fromPlayer, color, size, speed, onHitCallback) {
+            const startX = fromPlayer ? canvas.width * 0.28 : canvas.width * 0.74;
+            const targetX = fromPlayer ? canvas.width * 0.75 : canvas.width * 0.25;
+            const y = canvas.height * 0.78 - 45;
+
+            projectiles.push({
+                x: startX, y: y, startX: startX, targetX: targetX,
+                fromPlayer: fromPlayer, color: color, size: size, speed: speed,
+                onHit: onHitCallback
+            });
+        }
+
+        function spawnExplosion(x, y, color, count = 28) {
+            shockwaves.push({ x: x, y: y, r: 10, maxR: 75, color: color, alpha: 0.9 });
+            for (let i = 0; i < count; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const spd = Math.random() * 7 + 2;
+                particles.push({ x: x, y: y, vx: Math.cos(angle) * spd, vy: Math.sin(angle) * spd, color: color, alpha: 1, size: Math.random() * 5 + 2 });
+            }
+        }
+
+        function spawnFloatingText(text, isPlayerSide, color) {
+            const x = isPlayerSide ? canvas.width * 0.23 : canvas.width * 0.77;
+            const y = canvas.height * 0.78 - 95;
+            floatingTexts.push({ text: text, x: x, y: y, color: color, alpha: 1 });
+        }
+
+        function updateAndDrawEffects() {
+            for (let i = shockwaves.length - 1; i >= 0; i--) {
+                const sw = shockwaves[i];
+                sw.r += 4.5; sw.alpha -= 0.04;
+                if (sw.alpha <= 0) { shockwaves.splice(i, 1); continue; }
+                ctx.save(); ctx.globalAlpha = sw.alpha; ctx.strokeStyle = sw.color; ctx.lineWidth = 3;
+                ctx.beginPath(); ctx.arc(sw.x, sw.y, sw.r, 0, Math.PI * 2); ctx.stroke(); ctx.restore();
+            }
+
+            for (let i = projectiles.length - 1; i >= 0; i--) {
+                const p = projectiles[i];
+                const dir = p.fromPlayer ? 1 : -1;
+                p.x += dir * p.speed;
+                ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill();
+                const hit = p.fromPlayer ? (p.x >= p.targetX) : (p.x <= p.targetX);
+                if (hit) {
+                    spawnExplosion(p.targetX, p.y, p.color, 28);
+                    if (p.onHit) p.onHit();
+                    projectiles.splice(i, 1);
+                }
+            }
+
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const pt = particles[i];
+                pt.x += pt.vx; pt.y += pt.vy; pt.alpha -= 0.03;
+                if (pt.alpha <= 0) { particles.splice(i, 1); continue; }
+                ctx.save(); ctx.globalAlpha = pt.alpha; ctx.fillStyle = pt.color;
+                ctx.beginPath(); ctx.arc(pt.x, pt.y, pt.size, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+            }
+
+            for (let i = floatingTexts.length - 1; i >= 0; i--) {
+                const ft = floatingTexts[i];
+                ft.y -= 1.2; ft.alpha -= 0.018;
+                if (ft.alpha <= 0) { floatingTexts.splice(i, 1); continue; }
+                ctx.save(); ctx.globalAlpha = ft.alpha; ctx.font = '900 18px Orbitron';
+                ctx.fillStyle = ft.color; ctx.textAlign = 'center'; ctx.fillText(ft.text, ft.x, ft.y); ctx.restore();
+            }
+        }
+
+        function gameLoop(time) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const currentTheme = LEVELS[currentLevelIdx].bgTheme;
+            drawBackground(currentTheme, time);
+            drawPlayerAndSquad(time);
+            if (enemy.hp > 0) drawEnemy(time);
+            updateAndDrawEffects();
+            requestAnimationFrame(gameLoop);
+        }
+
+        /**
+         * ============================================================================
+         * 7. LOGIKA PERTARUNGAN
+         * ============================================================================
+         */
+        function triggerScreenShake() {
+            const container = document.getElementById('gameContainer');
+            container.classList.remove('shake-screen');
+            void container.offsetWidth;
+            container.classList.add('shake-screen');
+        }
+
+        function setBattleLog(msg) {
+            document.getElementById('battleLog').innerHTML = msg;
+        }
+
+        function updateHUD() {
+            document.getElementById('playerHpText').textContent = `${Math.max(0, player.hp)}/${player.maxHp}`;
+            document.getElementById('playerHpBar').style.width = `${(Math.max(0, player.hp) / player.maxHp) * 100}%`;
+            document.getElementById('playerEnergyText').textContent = `${player.energy}/${player.maxEnergy}`;
+            document.getElementById('playerEnergyBar').style.width = `${(player.energy / player.maxEnergy) * 100}%`;
+
+            const pBuffs = document.getElementById('playerBuffs');
+            let buffHtml = `<span class="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-bold">🤖 Bot Lv.${robotConfig.calibrationLevel}</span>`;
+            const unlockedCount = COMPANIONS.filter(c => (currentLevelIdx + 1) >= c.unlockLevel).length;
+            if (unlockedCount > 0) {
+                buffHtml += `<span class="px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 text-[10px] font-bold">🛸 ${unlockedCount} Asisten</span>`;
+            }
+            if (overdriveTurns > 0) {
+                buffHtml += `<span class="px-1.5 py-0.5 rounded bg-yellow-500/25 text-yellow-300 border border-yellow-400/50 text-[10px] font-bold">🧩 Overdrive</span>`;
+            }
+            pBuffs.innerHTML = buffHtml;
+
+            const levelData = LEVELS[currentLevelIdx];
+            document.getElementById('enemyNameText').textContent = enemy.name;
+            document.getElementById('enemyHpText').textContent = `${Math.max(0, enemy.hp)}/${enemy.maxHp}`;
+            document.getElementById('enemyHpBar').style.width = `${(Math.max(0, enemy.hp) / enemy.maxHp) * 100}%`;
+            document.getElementById('enemyWeaknessText').textContent = levelData.weaknessLabel;
+
+            const disableAll = !isPlayerTurn || isGameOver;
+            document.getElementById('btnSkill1').disabled = disableAll;
+            document.getElementById('btnSkill2').disabled = disableAll || player.energy < 25;
+            document.getElementById('btnSkill3').disabled = disableAll || player.energy < 20;
+            document.getElementById('btnSkill4').disabled = disableAll || player.energy < 20;
+            document.getElementById('btnSkill5').disabled = disableAll || player.energy < 60;
+
+            const turnBadge = document.getElementById('turnBadge');
+            turnBadge.textContent = isPlayerTurn ? "GILIRANMU" : "GILIRAN MUSUH";
+        }
+
+        function playerAction(skill) {
+            if (!isPlayerTurn || isGameOver) return;
+            if (!audioEngine.ctx) audioEngine.init();
+
+            isPlayerTurn = false;
+            player.shieldActive = false;
+            updateHUD();
+
+            const levelData = LEVELS[currentLevelIdx];
+            const isWeakness = (levelData.weakness === skill);
+            const odMult = overdriveTurns > 0 ? 1.4 : 1.0;
+            if (overdriveTurns > 0) overdriveTurns--;
+            const mult = (isWeakness ? 1.35 : 1.0) * odMult;
+
+            if (skill === 'laser') {
+                audioEngine.playSFX('laser');
+                spawnProjectile(true, '#22d3ee', 8, 18, () => {
+                    const dmg = Math.round(18 * mult);
+                    enemy.hp -= dmg;
+                    player.energy = Math.min(player.maxEnergy, player.energy + 25);
+                    spawnFloatingText(`-${dmg}`, false, '#38bdf8');
+                    setBattleLog(`🔦 <strong>Laser Foton</strong> menembus target (-${dmg} HP, +25 ⚡)!`);
+                    triggerRobotAndCompanions();
+                });
+            } else if (skill === 'exothermic') {
+                player.energy -= 25;
+                audioEngine.playSFX('explosion');
+                spawnProjectile(true, '#f97316', 14, 15, () => {
+                    const dmg = Math.round(36 * mult);
+                    enemy.hp -= dmg;
+                    enemy.burnTurns = 2;
+                    triggerScreenShake();
+                    spawnFloatingText(`-${dmg}`, false, '#fb923c');
+                    setBattleLog(`🔥 <strong>Reaksi Eksotermik</strong> membakar target (-${dmg} HP)!`);
+                    triggerRobotAndCompanions();
+                });
+            } else if (skill === 'catalyst') {
+                player.energy -= 20;
+                audioEngine.playSFX('laser');
+                spawnProjectile(true, '#84cc16', 12, 16, () => {
+                    const dmg = Math.round(28 * mult);
+                    enemy.hp -= dmg;
+                    enemy.poisonTurns = 2;
+                    spawnFloatingText(`-${dmg}`, false, '#a3e635');
+                    setBattleLog(`🧪 <strong>Katalis Kimia</strong> mengkorosi musuh (-${dmg} HP)!`);
+                    triggerRobotAndCompanions();
+                });
+            } else if (skill === 'shield') {
+                player.energy -= 20;
+                player.shieldActive = true;
+                player.hp = Math.min(player.maxHp, player.hp + 20);
+                audioEngine.playSFX('shield');
+                spawnFloatingText(`+20 HP`, true, '#34d399');
+                setBattleLog(`🛡️ <strong>Medan Magnet</strong> aktif! (+20 HP & reduksi DMG).`);
+                triggerRobotAndCompanions();
+            } else if (skill === 'fusion') {
+                player.energy -= 60;
+                audioEngine.playSFX('fusion');
+                spawnProjectile(true, '#c084fc', 22, 14, () => {
+                    const dmg = Math.round(70 * mult);
+                    enemy.hp -= dmg;
+                    enemy.stunned = true;
+                    triggerScreenShake();
+                    spawnFloatingText(`-${dmg} FUSI!`, false, '#e879f9');
+                    setBattleLog(`☢️ <strong>FUSI NUKLIR!</strong> Hancurkan target (-${dmg} HP & Stun)!`);
+                    triggerRobotAndCompanions();
+                });
+            }
+        }
+
+        function triggerRobotAndCompanions() {
+            updateHUD();
+            if (enemy.hp <= 0) {
+                handleEnemyDefeated();
+                return;
+            }
+
+            setTimeout(() => {
+                const rStats = getRobotStats();
+                let totalAllyDmg = rStats.botDmg;
+                let totalAllyHeal = rStats.botHeal;
+                let totalAllyEnergy = rStats.botEnergy;
+
+                const currentLvl = currentLevelIdx + 1;
+                COMPANIONS.forEach(comp => {
+                    if (currentLvl >= comp.unlockLevel) {
+                        totalAllyDmg += comp.bonusDmg;
+                        totalAllyHeal += comp.bonusHp;
+                        totalAllyEnergy += comp.bonusEn;
+                    }
+                });
+
+                spawnProjectile(true, rStats.weapon.color, 7, 22, () => {
+                    enemy.hp -= totalAllyDmg;
+                    player.hp = Math.min(player.maxHp, player.hp + totalAllyHeal);
+                    player.energy = Math.min(player.maxEnergy, player.energy + totalAllyEnergy);
+
+                    spawnFloatingText(`-${totalAllyDmg} BOT`, false, '#facc15');
+                    updateHUD();
+                    if (enemy.hp <= 0) {
+                        handleEnemyDefeated();
+                    } else {
+                        setTimeout(enemyTurn, 850);
+                    }
+                });
+            }, 550);
+        }
+
+        function handleEnemyDefeated() {
+            enemy.hp = 0;
+            updateHUD();
+            audioEngine.playSFX('win');
+            setTimeout(() => {
+                showEndLevelComic();
+            }, 800);
+        }
+
+        function showEndLevelComic() {
+            const levelData = LEVELS[currentLevelIdx];
+            const comicModal = document.getElementById('comicModal');
+            document.getElementById('comicHeaderBadge').textContent = `📖 KOMIK BAB ${levelData.id} / 25 SELESAI!`;
+            document.getElementById('comicP1Icon').textContent = levelData.icon;
+            document.getElementById('comicP1Text').textContent = `"${levelData.comic[0]}"`;
+            document.getElementById('comicP2Text').textContent = `"${levelData.comic[1]}"`;
+            document.getElementById('comicP3Text').textContent = `"${levelData.comic[2]}"`;
+
+            const nextBtn = document.getElementById('comicNextBtn');
+            if (currentLevelIdx < LEVELS.length - 1) {
+                nextBtn.textContent = `LANJUT KE BAB ${levelData.id + 1} ➡️`;
+                nextBtn.onclick = () => {
+                    audioEngine.playSFX('ui');
+                    comicModal.classList.add('hidden');
+                    currentLevelIdx++;
+                    showStoryModal('intro');
+                };
+            } else {
+                nextBtn.textContent = "SELESAI 25 BAB 🏆";
+                nextBtn.onclick = () => {
+                    audioEngine.playSFX('ui');
+                    comicModal.classList.add('hidden');
+                    isGameOver = true;
+                    showStoryModal('victory_all');
+                };
+            }
+            comicModal.classList.remove('hidden');
+        }
+
+        function enemyTurn() {
+            if (isGameOver) return;
+            const levelData = LEVELS[currentLevelIdx];
+
+            let dotDmg = 0;
+            if (enemy.burnTurns > 0) { dotDmg += 8; enemy.burnTurns--; }
+            if (enemy.poisonTurns > 0) { dotDmg += 8; enemy.poisonTurns--; }
+            if (dotDmg > 0) {
+                enemy.hp -= dotDmg;
+                spawnFloatingText(`-${dotDmg} REAKSI`, false, '#fb923c');
+                updateHUD();
+                if (enemy.hp <= 0) {
+                    handleEnemyDefeated();
+                    return;
+                }
+            }
+
+            if (enemy.stunned) {
+                enemy.stunned = false;
+                setBattleLog(`⚡ <strong>${enemy.name}</strong> lumpuh!`);
+                endEnemyTurn();
+                return;
+            }
+
+            let dmg = enemy.atk;
+            audioEngine.playSFX('laser');
+
+            spawnProjectile(false, levelData.enemy.color, 12, 16, () => {
+                if (player.shieldActive) {
+                    dmg = Math.max(2, Math.floor(dmg * 0.25));
+                    audioEngine.playSFX('shield');
+                } else {
+                    audioEngine.playSFX('explosion');
+                    triggerScreenShake();
+                }
+
+                player.hp -= dmg;
+                spawnFloatingText(`-${dmg}`, true, '#f43f5e');
+                setBattleLog(`👾 <strong>${enemy.name}</strong> menyerang (-${dmg} HP)`);
+                updateHUD();
+
+                if (player.hp <= 0) {
+                    player.hp = 0;
+                    updateHUD();
+                    isGameOver = true;
+                    showStoryModal('gameover');
+                } else {
+                    endEnemyTurn();
+                }
+            });
+        }
+
+        function endEnemyTurn() {
+            turnCount++;
+            isPlayerTurn = true;
+            updateHUD();
+        }
+
+        /**
+         * ============================================================================
+         * 8. MANAJEMEN STORY MODAL
+         * ============================================================================
+         */
+        function showStoryModal(mode) {
+            const modal = document.getElementById('storyModal');
+            const levelData = LEVELS[currentLevelIdx];
+            const compBox = document.getElementById('modalCompanionBox');
+            compBox.classList.add('hidden');
+
+            if (mode === 'intro' || mode === 'review') {
+                document.getElementById('modalBadge').textContent = levelData.badge;
+                document.getElementById('modalTitle').textContent = levelData.title;
+                document.getElementById('modalIcon').textContent = levelData.icon;
+                document.getElementById('modalStoryText').innerHTML = levelData.story;
+
+                const newComp = COMPANIONS.find(c => c.unlockLevel === levelData.id);
+                if (newComp) {
+                    compBox.classList.remove('hidden');
+                    document.getElementById('modalCompanionText').innerHTML = `${newComp.icon} <strong>${newComp.name}</strong>: ${newComp.desc}`;
+                }
+
+                document.getElementById('modalActionBtn').textContent = mode === 'review' ? "LANJUTKAN ⚔️" : "MULAI PERTARUNGAN 🚀";
+                document.getElementById('modalActionBtn').onclick = () => {
+                    audioEngine.playSFX('ui');
+                    modal.classList.add('hidden');
+                    if (mode === 'intro') initLevel(currentLevelIdx);
+                };
+            } else if (mode === 'gameover') {
+                document.getElementById('modalBadge').textContent = "EKSPERIMEN GAGAL";
+                document.getElementById('modalTitle').textContent = "DR. PROTON TUMBANG!";
+                document.getElementById('modalIcon').textContent = "💀";
+                document.getElementById('modalStoryText').innerHTML = `Energi pelindungmu habis. Coba sesuaikan komponen Mecha-Bot di Ruang Robotik!`;
+                document.getElementById('modalActionBtn').textContent = "ULANGI LEVEL 🔄";
+                document.getElementById('modalActionBtn').onclick = () => {
+                    audioEngine.playSFX('ui');
+                    modal.classList.add('hidden');
+                    initLevel(currentLevelIdx);
+                };
+            } else if (mode === 'victory_all') {
+                document.getElementById('modalBadge').textContent = "25/25 BAB SELESAI";
+                document.getElementById('modalTitle').textContent = "SEMESTA SAINS SELAMAT!";
+                document.getElementById('modalIcon').textContent = "🏆";
+                document.getElementById('modalStoryText').innerHTML = `Luar biasa! Seluruh 25 level berhasil diselesaikan bersama skuad asisten sains!`;
+                document.getElementById('modalActionBtn').textContent = "MAIN DARI AWAL 🔁";
+                document.getElementById('modalActionBtn').onclick = () => {
+                    audioEngine.playSFX('ui');
+                    currentLevelIdx = 0;
+                    showStoryModal('intro');
+                };
+            }
+
+            modal.classList.remove('hidden');
+        }
+
+        function initLevel(idx) {
+            const levelData = LEVELS[idx];
+            const rStats = getRobotStats();
+            isGameOver = false;
+            isPlayerTurn = true;
+            turnCount = 1;
+            lastSkillUsed = null;
+            overdriveTurns = 0;
+
+            player.baseMaxHp = 100 + (idx * 14);
+            player.maxHp = player.baseMaxHp + rStats.bonusHp;
+            player.hp = player.maxHp;
+            player.energy = 55;
+            player.shieldActive = false;
+
+            enemy = {
+                name: levelData.enemy.name,
+                maxHp: levelData.enemy.maxHp,
+                hp: levelData.enemy.maxHp,
+                atk: levelData.enemy.atk,
+                stunned: false,
+                burnTurns: 0,
+                poisonTurns: 0,
+                xOffset: 0
+            };
+
+            document.getElementById('levelIndicator').textContent = `BAB ${levelData.id}/25: ${levelData.title}`;
+            document.getElementById('scienceHintBox').innerHTML = `💡 <strong>Fakta Sains:</strong> ${levelData.scienceTip}`;
+            setBattleLog(`⚠️ <strong>${enemy.name}</strong> muncul! Kelemahan: <strong>${levelData.weaknessLabel}</strong>`);
+            
+            audioEngine.playBGM(idx);
+            updateHUD();
+        }
+
+        document.getElementById('storyBtn').addEventListener('click', () => {
+            audioEngine.playSFX('ui');
+            showStoryModal('review');
+        });
+
+        window.onload = function() {
+            resizeCanvas();
+            showStoryModal('intro');
+            requestAnimationFrame(gameLoop);
+        };
+    </script>
+</body>
+</html>
